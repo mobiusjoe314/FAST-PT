@@ -22,7 +22,7 @@ from functools import reduce
 from scipy.signal import fftconvolve
 import scipy.interpolate as interpolate
 
-import FASTPT
+# import FASTPT
 
 
 

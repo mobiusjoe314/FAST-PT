@@ -51,7 +51,7 @@ from .IA_tt import IA_tt
 from .IA_ABD import IA_A, IA_DEE, IA_DBB, P_IA_B
 from .IA_ta import IA_deltaE1, P_IA_deltaE2, IA_0E0E, IA_0B0B
 from .IA_tidal import IA_tidal
-# from .LVDM import LVDM, LVDM_P13like # right now, there are import problems
+from .LVDM import LVDM, LVDM_P13like # right now, there are import problems
 from .OV import OV
 from .kPol import kPol
 from .RSD import RSDA, RSDB
