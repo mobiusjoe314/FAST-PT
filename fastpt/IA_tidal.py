@@ -14,7 +14,9 @@ intervening in the following terms (using the notations used in 1603.04826v2):
 where D denotes the Dirac delta. Switch the E indices to B to get the B-mode
 parts.
 
-See IA_tidal.IA_tidal()
+See also
+--------
+IA_tidal.IA_tidal
 """
 
 from copy import deepcopy
@@ -23,9 +25,127 @@ import numpy as np
 
 from .J_table import J_table
 
+
+# (i) Ordering is α, β, l₁, l₂, l, A coefficient
+
+_l_mat_null = np.array([[0, 0, 0, 0, 0, 0]], dtype=float)
+
+# Terms proportional to bs·C1:
+_l_mat_bsC1 = np.array(
+    [[ 0,  0, 0, 0, 0,   8./315],
+    [  1, -1, 0, 0, 1,   4./15 ],
+    # [  1, -1, 1, 0, 0,   2./15 ],
+    # [ -1,  1, 1, 0, 0,   2./15 ],
+    [  0,  0, 0, 0, 2, 254./441],
+    [  1, -1, 0, 0, 3,   2./5  ], # Equivalent to the two lines commented
+                                  # because of symmetry
+    # [  1, -1, 3, 0, 0,   1./5  ],
+    # [ -1,  1, 3, 0, 0,   1./5  ],
+    [  0,  0, 0, 0, 4,  16./245]], dtype=float)
+# The two matrices are the same in this case. Only the fEk and fBk will affect
+# the result, hence:
+# l_mat_B = deepcopy(l_mat_E)
+
+# Terms proportional to bs·C1δ:
+_l_mat_bsC1δ = np.array([[0, 0, 0, 2, 2, 2./3]], dtype=float)
+# The B component is null, so:
+# l_mat_Bδ = _l_mat_null
+
+_l_mat_bsC2 = np.array(
+    [[0, 0, 0, 0, 0, - 2./45],
+    [ 0, 0, 1, 1, 1,   2./ 5],
+    [ 0, 0, 0, 0, 2, -11./63],
+    # [ 0, 0, 0, 2, 2, - 4./ 9],
+    [ 0, 0, 0, 2, 2, - 2./ 9],
+    [ 0, 0, 2, 0, 2, - 2./ 9],
+    [ 0, 0, 1, 1, 3,   3./ 5],
+    [ 0, 0, 0, 0, 4, - 4./35]], dtype=float)
+
+_l_mat_bsbt = np.array(
+    [[0, 0, 0, 0, 0,   8./315],
+    [ 0, 0, 0, 0, 2, -40./441],
+    [ 0, 0, 0, 0, 4,  16./245]], dtype=float)
+
+_l_mat_b1bt = np.array(
+    [[0,  0, 0, 0, 0, -36./ 245],
+    [ 1, -1, 0, 0, 1, - 4./  35],
+    [ 0,  0, 0, 0, 2,  44./ 343],
+    [ 1, -1, 0, 0, 3,   4./  35],
+    [ 0,  0, 0, 0, 4,  32./1715]], dtype=float)
+
+# l_mat_A00E = np.array([[0,0,0,2,0,17./21],\
+#       [0,0,0,2,2,4./21],\
+#       [1,-1,0,2,1,1./2],\
+#       [-1,1,0,2,1,1./2]], dtype=float)
+
+_l_mat_b2C1 = np.array(
+    [[ 0,  0, 0, 0, 0, 17./21],
+    [  1, -1, 0, 0, 1,  1./ 2],
+    [ -1,  1, 0, 0, 1,  1./ 2],
+    [  0,  0, 0, 0, 2,  4./21]], dtype=float)
+
+_l_mat_b2C1δ = np.array(
+    [[ 0, 0, 0, 2, 0, 1.]], dtype=float) # _l_mat_null # ???
+
+_l_mat_b2C2 = np.array(
+    [[0, 0, 0, 0, 0, -1./6],
+    [ 0, 0, 1, 1, 1,  3./2],
+    [ 0, 0, 2, 0, 0, -1./3],
+    [ 0, 0, 0, 2, 0, -1./3],
+    [ 0, 0, 0, 0, 2, -1./3]], dtype=float)
+
+
+def _to_J(matrix):
+    """
+    Independently applies J_table to each row of the matrix `matrix` provided.
+
+    Parameters
+    ----------
+    matrix : 2D-array
+        A 2D-array whose rows are the coefficients α, β, l₁, l₂, l and A, in
+        this order.
+
+    Returns
+    -------
+    2D-array
+        A 2D-array where each row is the result of `J_table` with the
+        coefficient α, β, l₁, l₂, l and A as arguments.
+
+    See also
+    --------
+    J_table.J_table : Computes (α, β, l1, l2, l, J1, J2, Jk, A, B).
+    """
+    
+    return np.vstack(tuple(J_table(row) for row in matrix))
+
+
+def _tables_to_J(*table_list):
+    """
+    Independently applies the `_to_J` function to each list provided via a
+    simple Python list comprehension.
+
+    Returns
+    -------
+    list of 2D-arrays
+        List of the matrices resulting from `_to_J` being applied to each
+        input matrices.
+
+    See also
+    --------
+    _to_J : Applies J_table to each row of a matrix.
+    J_table.J_table : Computes (α, β, l1, l2, l, J1, J2, Jk, A, B).
+
+    Examples
+    --------
+    >>> _tables_to_J(table_1, table_2, table_3):
+    """    
+    
+    return [_to_J(table) for table in table_list]
+
+
 def IA_tidal():
     """
-    Outputs four 2D arrays whose rows correspond to the J_table
+    Outputs four 2D arrays whose rows correspond to the `J_table`
     function applied on each set of coefficients (α, β, l₁, l₂, l, A)
     characterising each kernel.
 
@@ -36,72 +156,98 @@ def IA_tidal():
     4. bs bt term
     5. b1 bt term
     All cover the E component: the B counterpart is null in all these cases.
-
-    See J_table.J_table(...)
+    
+    Returns
+    -------
+    list of 2D-arrays
+        Returns, ordered in a list, the the coefficients from `J_table` for each
+        of the pieces listed above.
+    
+    See also
+    --------
+    J_table.J_table : Computes (α, β, l1, l2, l, J1, J2, Jk, A, B).
     """
 
-    # Ordering is α, β, l₁, l₂, l, A coefficient
+    return _tables_to_J(_l_mat_bsC1, _l_mat_bsC1δ, _l_mat_bsC2, _l_mat_bsbt, _l_mat_b1bt)
 
-    # Terms proportional to bs·C1:
-    l_mat_C1 = np.array(
-        [[ 0,  0, 0, 0, 0,   8./315],
-        [  1, -1, 0, 0, 1,   4./15 ],
-        # [  1, -1, 1, 0, 0,   2./15 ],
-        # [ -1,  1, 1, 0, 0,   2./15 ],
-        [  0,  0, 0, 0, 2, 254./441],
-        [  1, -1, 0, 0, 3,   2./5  ], # Equivalent to the two lines commented
-                                      # because of symmetry
-        # [  1, -1, 3, 0, 0,   1./5  ],
-        # [ -1,  1, 3, 0, 0,   1./5  ],
-        [  0,  0, 0, 0, 4,  16./245]], dtype=float)
-    # The two matrices are the same in this case. Only the fEk and fBk will affect
-    # the result, hence:
-    # l_mat_B = deepcopy(l_mat_E)
 
-    # Terms proportional to bs·C1δ:
-    l_mat_C1δ = np.array([[0, 0, 0, 2, 2, 2./3]], dtype=float)
-    # The B component is null, so:
-    # l_mat_Bδ = np.array([[0, 0, 0, 0, 0, 0]], dtype=float)
+def IA_bs():
+    """
+    Outputs four 2D arrays whose rows correspond to the J_table
+    function applied on each set of coefficients (α, β, l₁, l₂, l, A)
+    characterising each kernel.
 
-    l_mat_C2 = np.array(
-        [[0, 0, 0, 0, 0, - 2./45],
-        [ 0, 0, 1, 1, 1,   2./ 5],
-        [ 0, 0, 0, 0, 2, -11./63],
-        # [ 0, 0, 0, 2, 2, - 4./ 9],
-        [ 0, 0, 0, 2, 2, - 2./ 9],
-        [ 0, 0, 2, 0, 2, - 2./ 9],
-        [ 0, 0, 1, 1, 3,   3./ 5],
-        [ 0, 0, 0, 0, 4, - 4./35]], dtype=float)
+    Schematically, the ordering is:
+    1. bs C1 term
+    2. bs C1δ term
+    3. bs C2 term
 
-    l_mat_bt = np.array(
-        [[0, 0, 0, 0, 0,   8./315],
-        [ 0, 0, 0, 0, 2, -40./441],
-        [ 0, 0, 0, 0, 4,  16./245]], dtype=float)
+    All cover the E component: the B counterpart is null in all these cases.
 
-    l_mat_b1bt = np.array(
-        [[0,  0, 0, 0, 0, -36./ 245],
-        [ 1, -1, 0, 0, 1, - 4./  35],
-        [ 0,  0, 0, 0, 2,  44./ 343],
-        [ 1, -1, 0, 0, 3,   4./  35],
-        [ 0,  0, 0, 0, 4,  32./1715]], dtype=float)
+    Returns
+    -------
+    list of 2D-arrays
+        Returns, ordered in a list, the the coefficients from `J_table` for each
+        of the pieces listed above.
 
-    # l_mat_A00E = np.array([[0,0,0,2,0,17./21],\
-    #       [0,0,0,2,2,4./21],\
-    #       [1,-1,0,2,1,1./2],\
-    #       [-1,1,0,2,1,1./2]], dtype=float)
+    See also
+    --------
+    J_table.J_table : Computes (α, β, l1, l2, l, J1, J2, Jk, A, B).
 
-    to_J = lambda matrix: np.vstack(tuple(J_table(row) for row in matrix))
+    """
 
-    tableC1 = to_J(l_mat_C1)
+    return _tables_to_J(_l_mat_bsC1, _l_mat_bsC1δ, _l_mat_bsC2)
 
-    tableC1δ = to_J(l_mat_C1δ)
 
-    tableC2 = to_J(l_mat_C2)
+def IA_b2():
+    """
+    Outputs four 2D arrays whose rows correspond to the J_table
+    function applied on each set of coefficients (α, β, l₁, l₂, l, A)
+    characterising each kernel.
 
-    tablebt = to_J(l_mat_bt)
+    Schematically, the ordering is:
+    1. bs C1 term
+    2. bs C1δ term
+    3. bs C2 term
+    All cover the E component: the B counterpart is null in all these cases.
 
-    tableb1bt = to_J(l_mat_b1bt)
+    Returns
+    -------
+    list of 2D-arrays
+        Returns, ordered in a list, the the coefficients from `J_table` for each
+        of the pieces listed above.
 
-    # tableA00E = to_J(l_mat_A00E)
+    See also
+    --------
+    J_table.J_table : Computes (α, β, l1, l2, l, J1, J2, Jk, A, B).
+    """
+    
+    # b2.C1
+    # b2.C2
+    # b2.C1δ
+    return _tables_to_J(_l_mat_b2C1, _l_mat_b2C1δ, _l_mat_b2C2)
 
-    return tableC1, tableC1δ, tableC2, tablebt, tableb1bt
+
+def Ct_mat():
+    """
+    Outputs four 2D arrays whose rows correspond to the J_table
+    function applied on each set of coefficients (α, β, l₁, l₂, l, A)
+    characterising each kernel.
+
+    Schematically, the ordering is:
+    1. bs Ct term
+    2. b1 Ct term
+    All cover the E component: the B counterpart is null in all these cases.
+
+    Returns
+    -------
+    list of 2D-arrays
+        Returns, ordered in a list, the the coefficients from `J_table` for each
+        of the pieces listed above.
+
+    See also
+    --------
+    J_table.J_table : Computes (α, β, l1, l2, l, J1, J2, Jk, A, B).
+    """    
+
+    return _tables_to_J(_l_mat_bsbt, _l_mat_b1bt)
