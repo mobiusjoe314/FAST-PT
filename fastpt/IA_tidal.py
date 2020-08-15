@@ -94,6 +94,10 @@ _l_mat_b2C2 = np.array(
     [ 0, 0, 0, 2, 0, -1./3],
     [ 0, 0, 0, 0, 2, -1./3]], dtype=float)
 
+_l_mat_b2Ct = np.array(
+    [[0, 0, 0, 0, 0, -4./21],
+    [ 0, 0, 0, 0, 2,  4./21]], dtype=float)
+
 
 def _to_J(matrix):
     """
@@ -168,7 +172,8 @@ def IA_tidal():
     J_table.J_table : Computes (α, β, l1, l2, l, J1, J2, Jk, A, B).
     """
 
-    return _tables_to_J(_l_mat_bsC1, _l_mat_bsC1δ, _l_mat_bsC2, _l_mat_bsbt, _l_mat_b1bt)
+    return _tables_to_J(_l_mat_bsC1, _l_mat_bsC1δ, _l_mat_bsC2,
+                        _l_mat_bsbt, _l_mat_b1bt)
 
 
 def IA_bs():
@@ -237,6 +242,7 @@ def Ct_mat():
     Schematically, the ordering is:
     1. bs Ct term
     2. b1 Ct term
+    3. b2 Ct term
     All cover the E component: the B counterpart is null in all these cases.
 
     Returns
@@ -250,4 +256,4 @@ def Ct_mat():
     J_table.J_table : Computes (α, β, l1, l2, l, J1, J2, Jk, A, B).
     """    
 
-    return _tables_to_J(_l_mat_bsbt, _l_mat_b1bt)
+    return _tables_to_J(_l_mat_bsbt, _l_mat_b1bt, _l_mat_b2Ct)
