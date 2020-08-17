@@ -211,9 +211,9 @@ def IA_b2():
     characterising each kernel.
 
     Schematically, the ordering is:
-    1. bs C1 term
-    2. bs C1δ term
-    3. bs C2 term
+    1. b2 C1 term
+    2. b2 C1δ term
+    3. b2 C2 term
     All cover the E component: the B counterpart is null in all these cases.
 
     Returns
