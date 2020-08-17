@@ -233,7 +233,39 @@ def IA_b2():
     return _tables_to_J(_l_mat_b2C1, _l_mat_b2C1δ, _l_mat_b2C2)
 
 
-def Ct_mat():
+def IA_b2bs():
+    """
+    Outputs four 2D arrays whose rows correspond to the J_table
+    function applied on each set of coefficients (α, β, l₁, l₂, l, A)
+    characterising each kernel.
+
+    Schematically, the ordering is:
+    
+    1. b2 C1 term
+    2. b2 C1δ term
+    3. b2 C2 term
+    
+    4. bs C1 term
+    5. bs C1δ term
+    6. bs C2 term
+    
+    All cover the E component: the B counterpart is null in all these cases.
+
+    Returns
+    -------
+    list of 2D-arrays
+        Returns, ordered in a list, the the coefficients from `J_table` for each
+        of the pieces listed above.
+
+    See also
+    --------
+    J_table.J_table : Computes (α, β, l1, l2, l, J1, J2, Jk, A, B).
+    """
+    
+    return IA_b2() + IA_bs()
+
+
+def IA_Ct():
     """
     Outputs four 2D arrays whose rows correspond to the J_table
     function applied on each set of coefficients (α, β, l₁, l₂, l, A)

@@ -50,7 +50,7 @@ from .initialize_params import scalar_stuff, tensor_stuff
 from .IA_tt import IA_tt
 from .IA_ABD import IA_A, IA_DEE, IA_DBB, P_IA_B
 from .IA_ta import IA_deltaE1, P_IA_deltaE2, IA_0E0E, IA_0B0B
-from .IA_tidal import IA_tidal
+from .IA_tidal import IA_tidal, IA_b2bs, IA_Ct
 from .LVDM import LVDM, LVDM_P13like # right now, there are import problems
 from .OV import OV
 from .kPol import kPol
@@ -209,7 +209,13 @@ class FASTPT:
                 self.IA_mix_do = True
 
             elif entry=="IA_tidal":
-                self.IA_tidal_do=True
+                self.IA_tidal_do = True
+
+            elif entry=="b2bs":
+                self.IA_b2bs_do = True
+
+            elif entry=="Ct":
+                self.IA_Ct_do = True
 
             elif entry=="LVDM":
                 self.LVDM_do = True
@@ -291,13 +297,14 @@ class FASTPT:
             self.X_IA_0B0B = tensor_stuff(p_mat_0B0B, self.N, self.m, self.eta_m, self.l, self.tau_l)
 
         if self.IA_tidal_do:
-            p_mat_K = tuple(ki[:, [0, 1, 5, 6, 7, 8, 9]] for ki in IA_tidal())
-            # Extracts the columns corresponding to the
-            # (alpha, beta, J1, J2, Jk, A, B) coefficients
+            self.X_tidal = get_X_table(self.IA_tidal())
 
-            self.X_tidal = tuple(tensor_stuff(p_mat_Ki, self.N,self.m,
-                self.eta_m, self.l, self.tau_l) for p_mat_Ki in p_mat_K)
-                
+        if self.IA_b2bs_do:
+            self.X_b2bs = self.get_X_table(self.IA_b2bs())
+
+        if self.IA_Ct_do:
+            self.X_Ct = self.get_X_table(self.IA_Ct())
+
         if self.LVDM_do:
             p_mat_K = tuple(ki[:, [0, 1, 5, 6, 7, 8, 9]] for ki in LVDM())
             # Extracts the columns corresponding to the
@@ -334,6 +341,16 @@ class FASTPT:
             tabB, self.B_coeff = RSDB()
             p_mat = tabB[:, [0, 1, 5, 6, 7, 8, 9]]
             self.X_RSDB = tensor_stuff(p_mat, self.N, self.m, self.eta_m, self.l, self.tau_l)
+
+
+    def get_X_table(self, list_of_J_tables):
+        p_mat_K = tuple(ki[:, [0, 1, 5, 6, 7, 8, 9]] for ki in list_of_J_tables)
+        # Extracts the columns corresponding to the
+        # (alpha, beta, J1, J2, Jk, A, B) coefficients
+
+        return tuple(tensor_stuff(p_mat_Ki, self.N,self.m,
+            self.eta_m, self.l, self.tau_l) for p_mat_Ki in p_mat_K)
+
 
     def run_parameters(self, l_mat, P, P_window=None, C_window=None):
         """
@@ -653,19 +670,28 @@ class FASTPT:
 
     ## eq 12 (line 2); eq 12 (line 3); eq 15 EE; eq 15 BB
 
+    def get_P22like_from_X_table(self, X_tables, P, P_window=None, C_window=None):
+        P_out = list()
+        for Xi in X_tables:
+            P_X = self.J_k_tensor(P, Xi,P_window=P_window, C_window=C_window)[0]
+            if (self.extrap):
+                _, P_X = self.EK.PK_original(P_X)
+            P_out.append(P_X)
+
+        return P_out
+
+    def IA_b2bs(self, P, P_window=None, C_window=None):
+        return self.get_P22like_from_X_table(self.X_b2bs, P, P_window, C_window)
+
+    def IA_Ct(self, P, P_window=None, C_window=None):
+        return self.get_P22like_from_X_table(self.X_Ct, P, P_window, C_window)
+
     def IA_tidal(self, P, P_window=None, C_window=None):
         """
         Returns a list of arrays!
         """
+        return self.get_P22like_from_X_table(self.X_tidal, P, P_window, C_window)
 
-        P_tidal = list()
-        for Xi in self.X_tidal:
-            P_X = self.J_k_tensor(P, Xi,P_window=P_window, C_window=C_window)[0]
-            if (self.extrap):
-                _, P_X = self.EK.PK_original(P_X)
-            P_tidal.append(P_X)
-
-        return P_tidal
         
     def LVDM(self, P, P_window=None, C_window=None):
         """
