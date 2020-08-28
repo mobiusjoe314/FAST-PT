@@ -178,6 +178,8 @@ class FASTPT:
         self.IA_ta_do = False
         self.IA_mix_do = False
         self.IA_tidal_do = False
+        self.IA_b2bs_do = False
+        self.IA_Ct_do = False
         self.LVDM_do = False
         self.OV_do = False
         self.kPol_do = False
@@ -297,13 +299,13 @@ class FASTPT:
             self.X_IA_0B0B = tensor_stuff(p_mat_0B0B, self.N, self.m, self.eta_m, self.l, self.tau_l)
 
         if self.IA_tidal_do:
-            self.X_tidal = get_X_table(self.IA_tidal())
+            self.X_tidal = self.get_X_table(IA_tidal())
 
         if self.IA_b2bs_do:
-            self.X_b2bs = self.get_X_table(self.IA_b2bs())
+            self.X_b2bs = self.get_X_table(IA_b2bs())
 
         if self.IA_Ct_do:
-            self.X_Ct = self.get_X_table(self.IA_Ct())
+            self.X_Ct = self.get_X_table(IA_Ct())
 
         if self.LVDM_do:
             p_mat_K = tuple(ki[:, [0, 1, 5, 6, 7, 8, 9]] for ki in LVDM())
