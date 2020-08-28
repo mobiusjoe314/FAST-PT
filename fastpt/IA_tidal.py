@@ -34,13 +34,13 @@ _l_mat_null = np.array([[0, 0, 0, 0, 0, 0]], dtype=float)
 _l_mat_bsC1 = np.array(
     [[ 0,  0, 0, 0, 0,   8./315],
     [  1, -1, 0, 0, 1,   4./15 ],
-    # [  1, -1, 1, 0, 0,   2./15 ],
-    # [ -1,  1, 1, 0, 0,   2./15 ],
+    # [  1, -1, 0, 0, 1,   2./15 ],
+    # [ -1,  1, 0, 0, 1,   2./15 ],
     [  0,  0, 0, 0, 2, 254./441],
     [  1, -1, 0, 0, 3,   2./5  ], # Equivalent to the two lines commented
                                   # because of symmetry
-    # [  1, -1, 3, 0, 0,   1./5  ],
-    # [ -1,  1, 3, 0, 0,   1./5  ],
+    # [  1, -1, 0, 0, 3,  1./5  ],
+    # [ -1,  1, 0, 0, 3,  1./5  ],
     [  0,  0, 0, 0, 4,  16./245]], dtype=float)
 # The two matrices are the same in this case. Only the fEk and fBk will affect
 # the result, hence:
@@ -61,12 +61,12 @@ _l_mat_bsC2 = np.array(
     [ 0, 0, 1, 1, 3,   3./ 5],
     [ 0, 0, 0, 0, 4, - 4./35]], dtype=float)
 
-_l_mat_bsbt = np.array(
+_l_mat_bsCt = np.array(
     [[0, 0, 0, 0, 0,   8./315],
     [ 0, 0, 0, 0, 2, -40./441],
     [ 0, 0, 0, 0, 4,  16./245]], dtype=float)
 
-_l_mat_b1bt = np.array(
+_l_mat_b1Ct = np.array(
     [[0,  0, 0, 0, 0, -36./ 245],
     [ 1, -1, 0, 0, 1, - 4./  35],
     [ 0,  0, 0, 0, 2,  44./ 343],
@@ -173,7 +173,7 @@ def IA_tidal():
     """
 
     return _tables_to_J(_l_mat_bsC1, _l_mat_bsC1δ, _l_mat_bsC2,
-                        _l_mat_bsbt, _l_mat_b1bt)
+                        _l_mat_bsCt, _l_mat_b1Ct)
 
 
 def IA_bs():
@@ -288,4 +288,4 @@ def IA_Ct():
     J_table.J_table : Computes (α, β, l1, l2, l, J1, J2, Jk, A, B).
     """    
 
-    return _tables_to_J(_l_mat_bsbt, _l_mat_b1bt, _l_mat_b2Ct)
+    return _tables_to_J(_l_mat_bsCt, _l_mat_b1Ct, _l_mat_b2Ct)
