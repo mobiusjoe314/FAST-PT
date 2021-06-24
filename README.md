@@ -11,7 +11,11 @@ the input linear power spectrum.
 Easy installation with pip:
 
 * `pip install fast-pt`
-* Note: use `--no-deps` if you use a conda python distribution
+* Note: use `--no-deps` if you use a conda python distribution, or just use conda installation
+
+Easy installation with conda:
+
+* `conda install fast-pt`
 
 Full installation with examples:
 
