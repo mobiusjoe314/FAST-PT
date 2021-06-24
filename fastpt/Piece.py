@@ -65,12 +65,36 @@ class P13likePiece(Piece):
     def __init__(self,
                  name: str = "Unnamed_P13likePiece",
                  k_correction=(lambda k: 1),
-                 **Zargs):
+                 **Zkwargs):
+        """[summary]
+
+        :param name: [description], defaults to "Unnamed_P13likePiece"
+        :type name: str, optional
+        :param k_correction: [description], defaults to (lambda k: 1)
+        :type k_correction: tuple, optional
+        :type Zargs:
+        """        
         Piece.__init__(self, name)
-        self.Z = lambda q: self.__init_Z(s=q, **Zargs)
+        self.Z = lambda q: self.__init_Z(s=q, **Zkwargs)
         self.k_correction = k_correction
 
     def __init_Z(self, s, Zmid, Zlow=None, Zhig=None, cut=(-7,7)):
+        """Returns an array representing Z for any values. This is achieved by
+        piecing together 
+
+        :param s: [description]
+        :type s: [type]
+        :param Zmid: [description]
+        :type Zmid: [type]
+        :param Zlow: [description], defaults to None
+        :type Zlow: [type], optional
+        :param Zhig: [description], defaults to None
+        :type Zhig: [type], optional
+        :param cut: [description], defaults to (-7,7)
+        :type cut: tuple, optional
+        :return: [description]
+        :rtype: [type]
+        """        
         #TODO: Clean a bit the cut and Zhig/Zlow things...
 
         if isinstance(cut, numbers.Number):
@@ -105,7 +129,7 @@ class P13likePiece(Piece):
         """Receiving the `in_val` values at the `out_val` positions,
         interpolates the `missing` components of `in_val` with
         `scipy.interpolate.interp1d`. The `**kwargs` are fowarded to the latter
-        function."""
+        function. This function thus returns a completed version of `out_val`"""
         out_val[missing] = interpolate.interp1d(in_val[lnot(missing)],
                                                 out_val[lnot(missing)],
                                                 fill_value="extrapolate",
@@ -154,6 +178,17 @@ class P13likePiece(Piece):
 
 class P22likePiece(Piece):
     def __init__(self, name="Unnamed_P22likePiece", kernel=None, fastpt_key=None):
+        """P22likePiece built to represent a convolution piece of the same form
+        as the P22 power spectrum contribution.
+
+        :param name: descriptive name of the piece, defaults to "Unnamed_P22likePiece"
+        :type name: str, optional
+        :param kernel: in order [denominator, numerator, function at mu=1 and q=k], defaults to None
+        :type kernel: iterable of three functions, optional
+        :param fastpt_key: string designating which Piece this corresponds to in FAST-PT, defaults to None
+        :type fastpt_key: str, optional
+        """        
+
         self.name = name
         self.kernel = kernel
         self.integral = [np.array([]), np.array([])]
