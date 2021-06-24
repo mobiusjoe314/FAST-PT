@@ -24,6 +24,7 @@ from copy import deepcopy
 import numpy as np
 
 from .J_table import J_table
+from .Piece import P13likePiece
 
 
 # (i) Ordering is α, β, l₁, l₂, l, A coefficient
@@ -289,3 +290,15 @@ def IA_Ct():
     """    
 
     return _tables_to_J(_l_mat_bsCt, _l_mat_b1Ct, _l_mat_b2Ct)
+
+def IA_bsC1_P13like(k, P):
+
+    return P13likePiece("P13_bsC1",
+            Zmid = lambda α : ((1/84) * (np.pi * ((α**-5) * ((4 * (α * (15+
+                ((-55 * (α**2))+((73 * (α**4))+(15 * (α**6)))))))+(-15 *
+                (((-1+(α**2))**4) * np.log((((-1+α)**-2) * ((1+α)**2))))))))),
+            Zlow = lambda α : ((128/4851) * (np.pi * ((α**-8) * (-1+((-11 *
+                (α**2))+((99 * (α**4))+((-231 * (α**6))+(231 * (α**8))))))))),
+            Zhig = lambda α : ((-128/63063) * (np.pi * ((α**2) * (-1287+
+                ((143 * (α**2))+((13 * (α**4))+(3 * (α**6))))))))
+        ).integrate(k, P, method="fftconvolve").P
